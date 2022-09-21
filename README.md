@@ -1,3 +1,7 @@
+Web Assembly向けに改変したSFMTの実装です.
+
+# Original README.md
+
 sfmt
 =====
 
