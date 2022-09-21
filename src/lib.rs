@@ -12,6 +12,7 @@
 
 mod packed;
 mod sfmt;
+
 #[cfg(feature = "thread_rng")]
 mod thread_rng;
 

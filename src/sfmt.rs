@@ -1,5 +1,4 @@
 //! Rust re-implementation of SFMT
-
 use super::*;
 use crate::packed::*;
 
@@ -22,20 +21,24 @@ pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
     const SFMT_PARITY2: u32;
     const SFMT_PARITY3: u32;
     const SFMT_PARITY4: u32;
-
+    
     fn mm_recursion(a: i32x4, b: i32x4, c: i32x4, d: i32x4) -> i32x4 {
         #[cfg(target_arch = "x86")]
         use std::arch::x86::*;
         #[cfg(target_arch = "x86_64")]
         use std::arch::x86_64::*;
+        #[cfg(target_arch = "wasm32")]
+        use std::arch::wasm32::*;
+        
+        let mask = new(
+            Self::SFMT_MSK1,
+            Self::SFMT_MSK2,
+            Self::SFMT_MSK3,
+            Self::SFMT_MSK4,
+        );
 
+        #[cfg(not(target_arch = "wasm32"))]
         unsafe {
-            let mask = new(
-                Self::SFMT_MSK1,
-                Self::SFMT_MSK2,
-                Self::SFMT_MSK3,
-                Self::SFMT_MSK4,
-            );
             let y = _mm_srli_epi32(b, Self::SFMT_SR1);
             let z = _mm_srli_si128(c, Self::SFMT_SR2);
             let v = _mm_slli_epi32(d, Self::SFMT_SL1);
@@ -45,6 +48,57 @@ pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
             let y = _mm_and_si128(y, mask);
             let z = _mm_xor_si128(z, x);
             _mm_xor_si128(z, y)
+
+        }
+        #[cfg(target_arch = "wasm32")]
+        {
+            let rotr:v128 = i8x16(
+                15 + Self::SFMT_SR2 as i8,
+                14 + Self::SFMT_SR2 as i8,
+                13 + Self::SFMT_SR2 as i8,
+                12 + Self::SFMT_SR2 as i8,
+                11 + Self::SFMT_SR2 as i8,
+                10 + Self::SFMT_SR2 as i8,
+                9 + Self::SFMT_SR2 as i8,
+                8 + Self::SFMT_SR2 as i8,
+                7 + Self::SFMT_SR2 as i8,
+                6 + Self::SFMT_SR2 as i8,
+                5 + Self::SFMT_SR2 as i8,
+                4 + Self::SFMT_SR2 as i8,
+                3 + Self::SFMT_SR2 as i8,
+                2 + Self::SFMT_SR2 as i8,
+                1 + Self::SFMT_SR2 as i8,
+                0 + Self::SFMT_SR2 as i8
+            );
+
+            let rotl:v128 = i8x16(
+                15 - Self::SFMT_SL2 as i8,
+                14 - Self::SFMT_SL2 as i8,
+                13 - Self::SFMT_SL2 as i8,
+                12 - Self::SFMT_SL2 as i8,
+                11 - Self::SFMT_SL2 as i8,
+                10 - Self::SFMT_SL2 as i8,
+                9 - Self::SFMT_SL2 as i8,
+                8 - Self::SFMT_SL2 as i8,
+                7 - Self::SFMT_SL2 as i8,
+                6 - Self::SFMT_SL2 as i8,
+                5 - Self::SFMT_SL2 as i8,
+                4 - Self::SFMT_SL2 as i8,
+                3 - Self::SFMT_SL2 as i8,
+                2 - Self::SFMT_SL2 as i8,
+                1 - Self::SFMT_SL2 as i8,
+                0 - Self::SFMT_SL2 as i8
+            );
+            
+            let y: v128 = i32x4_shr(b, Self::SFMT_SR1 as u32);
+            let z: v128 = i8x16_swizzle(c,rotr);
+            let v: v128 = i32x4_shl(d, Self::SFMT_SL1 as u32);
+            let z: v128 = v128_xor(z, a);
+            let z: v128 = v128_xor(z, v);
+            let x: v128 = i8x16_swizzle(a, rotl);
+            let y: v128 = v128_and(y, mask);
+            let z: v128 = v128_xor(z, x);
+            v128_xor(z, y)
         }
     }
 
