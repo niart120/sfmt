@@ -6,7 +6,7 @@ edition = "2018"
 
 description = "Rust implementation of SIMD-oriented Fast Mersenne Twister (SFMT)"
 documentation = "https://docs.rs/sfmt/"
-repository = "https://github.com/niart120/sfmt"
+repository = "https://github.com/termoshtt/rust-sfmt"
 keywords = ["random", "rng"]
 categories = ["algorithms"]
 license = "MIT"
