@@ -22,7 +22,7 @@ pub(crate) fn new(e0: i32, e1: i32, e2: i32, e3: i32) -> i32x4 {
 
 #[cfg(target_arch = "wasm32")]
 pub(crate) fn new(e0: i32, e1: i32, e2: i32, e3: i32) -> i32x4 {
-    i32x4(e3, e2, e1, e0)
+    i32x4(e0, e1, e2, e3)
 }
 
 #[cfg(not(target_arch = "wasm32"))]
