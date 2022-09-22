@@ -48,7 +48,6 @@ pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
             let y = _mm_and_si128(y, mask);
             let z = _mm_xor_si128(z, x);
             _mm_xor_si128(z, y)
-
         }
         #[cfg(target_arch = "wasm32")]
         {
