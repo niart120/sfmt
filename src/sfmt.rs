@@ -52,46 +52,46 @@ pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
         #[cfg(target_arch = "wasm32")]
         {
             let rotr:v128 = i8x16(
-                15 + Self::SFMT_SR2 as i8,
-                14 + Self::SFMT_SR2 as i8,
-                13 + Self::SFMT_SR2 as i8,
-                12 + Self::SFMT_SR2 as i8,
-                11 + Self::SFMT_SR2 as i8,
-                10 + Self::SFMT_SR2 as i8,
-                9 + Self::SFMT_SR2 as i8,
-                8 + Self::SFMT_SR2 as i8,
-                7 + Self::SFMT_SR2 as i8,
-                6 + Self::SFMT_SR2 as i8,
-                5 + Self::SFMT_SR2 as i8,
-                4 + Self::SFMT_SR2 as i8,
-                3 + Self::SFMT_SR2 as i8,
-                2 + Self::SFMT_SR2 as i8,
+                0 + Self::SFMT_SR2 as i8,
                 1 + Self::SFMT_SR2 as i8,
-                0 + Self::SFMT_SR2 as i8
+                2 + Self::SFMT_SR2 as i8,
+                3 + Self::SFMT_SR2 as i8,
+                4 + Self::SFMT_SR2 as i8,
+                5 + Self::SFMT_SR2 as i8,
+                6 + Self::SFMT_SR2 as i8,
+                7 + Self::SFMT_SR2 as i8,
+                8 + Self::SFMT_SR2 as i8,
+                9 + Self::SFMT_SR2 as i8,
+                10 + Self::SFMT_SR2 as i8,
+                11 + Self::SFMT_SR2 as i8,
+                12 + Self::SFMT_SR2 as i8,
+                13 + Self::SFMT_SR2 as i8,
+                14 + Self::SFMT_SR2 as i8,
+                15 + Self::SFMT_SR2 as i8
             );
 
             let rotl:v128 = i8x16(
-                15 - Self::SFMT_SL2 as i8,
-                14 - Self::SFMT_SL2 as i8,
-                13 - Self::SFMT_SL2 as i8,
-                12 - Self::SFMT_SL2 as i8,
-                11 - Self::SFMT_SL2 as i8,
-                10 - Self::SFMT_SL2 as i8,
-                9 - Self::SFMT_SL2 as i8,
-                8 - Self::SFMT_SL2 as i8,
-                7 - Self::SFMT_SL2 as i8,
-                6 - Self::SFMT_SL2 as i8,
-                5 - Self::SFMT_SL2 as i8,
-                4 - Self::SFMT_SL2 as i8,
-                3 - Self::SFMT_SL2 as i8,
-                2 - Self::SFMT_SL2 as i8,
+                0 - Self::SFMT_SL2 as i8,
                 1 - Self::SFMT_SL2 as i8,
-                0 - Self::SFMT_SL2 as i8
+                2 - Self::SFMT_SL2 as i8,
+                3 - Self::SFMT_SL2 as i8,
+                4 - Self::SFMT_SL2 as i8,
+                5 - Self::SFMT_SL2 as i8,
+                6 - Self::SFMT_SL2 as i8,
+                7 - Self::SFMT_SL2 as i8,
+                8 - Self::SFMT_SL2 as i8,
+                9 - Self::SFMT_SL2 as i8,
+                10 - Self::SFMT_SL2 as i8,
+                11 - Self::SFMT_SL2 as i8,
+                12 - Self::SFMT_SL2 as i8,
+                13 - Self::SFMT_SL2 as i8,
+                14 - Self::SFMT_SL2 as i8,
+                15 - Self::SFMT_SL2 as i8
             );
             
-            let y: v128 = i32x4_shr(b, Self::SFMT_SR1 as u32);
+            let y: v128 = u32x4_shr(b, Self::SFMT_SR1 as u32);
             let z: v128 = i8x16_swizzle(c,rotr);
-            let v: v128 = i32x4_shl(d, Self::SFMT_SL1 as u32);
+            let v: v128 = u32x4_shl(d, Self::SFMT_SL1 as u32);
             let z: v128 = v128_xor(z, a);
             let z: v128 = v128_xor(z, v);
             let x: v128 = i8x16_swizzle(a, rotl);
