@@ -21,6 +21,23 @@ pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
     const SFMT_PARITY2: u32;
     const SFMT_PARITY3: u32;
     const SFMT_PARITY4: u32;
+
+    #[inline]
+    #[cfg(target_arch = "wasm32")]
+    fn v128_shr(a: i32x4, y: i32)->i32x4{
+        use std::arch::wasm32::*;
+        let l = u64x2_extract_lane::<0>(a);
+        let u = u64x2_extract_lane::<1>(a);
+        u64x2((l>>y)|(u<<(64-y)),u>>y)
+    }
+    #[inline]
+    #[cfg(target_arch = "wasm32")]
+    fn v128_shl(a: i32x4, y: i32)->i32x4{
+        use std::arch::wasm32::*;
+        let l = u64x2_extract_lane::<0>(a);
+        let u = u64x2_extract_lane::<1>(a);
+        u64x2(l<<y,(u<<y)|l>>(64-y))
+    }
     
     fn mm_recursion(a: i32x4, b: i32x4, c: i32x4, d: i32x4) -> i32x4 {
         #[cfg(target_arch = "x86")]
@@ -51,50 +68,12 @@ pub trait SfmtParams<const MEXP: usize, const MEXP_N: usize>: Sized {
         }
         #[cfg(target_arch = "wasm32")]
         {
-            let rotr:v128 = i8x16(
-                0 + Self::SFMT_SR2 as i8,
-                1 + Self::SFMT_SR2 as i8,
-                2 + Self::SFMT_SR2 as i8,
-                3 + Self::SFMT_SR2 as i8,
-                4 + Self::SFMT_SR2 as i8,
-                5 + Self::SFMT_SR2 as i8,
-                6 + Self::SFMT_SR2 as i8,
-                7 + Self::SFMT_SR2 as i8,
-                8 + Self::SFMT_SR2 as i8,
-                9 + Self::SFMT_SR2 as i8,
-                10 + Self::SFMT_SR2 as i8,
-                11 + Self::SFMT_SR2 as i8,
-                12 + Self::SFMT_SR2 as i8,
-                13 + Self::SFMT_SR2 as i8,
-                14 + Self::SFMT_SR2 as i8,
-                15 + Self::SFMT_SR2 as i8
-            );
-
-            let rotl:v128 = i8x16(
-                0 - Self::SFMT_SL2 as i8,
-                1 - Self::SFMT_SL2 as i8,
-                2 - Self::SFMT_SL2 as i8,
-                3 - Self::SFMT_SL2 as i8,
-                4 - Self::SFMT_SL2 as i8,
-                5 - Self::SFMT_SL2 as i8,
-                6 - Self::SFMT_SL2 as i8,
-                7 - Self::SFMT_SL2 as i8,
-                8 - Self::SFMT_SL2 as i8,
-                9 - Self::SFMT_SL2 as i8,
-                10 - Self::SFMT_SL2 as i8,
-                11 - Self::SFMT_SL2 as i8,
-                12 - Self::SFMT_SL2 as i8,
-                13 - Self::SFMT_SL2 as i8,
-                14 - Self::SFMT_SL2 as i8,
-                15 - Self::SFMT_SL2 as i8
-            );
-            
             let y: v128 = u32x4_shr(b, Self::SFMT_SR1 as u32);
-            let z: v128 = i8x16_swizzle(c,rotr);
+            let z = Self::v128_shr(c,Self::SFMT_SR2*8);
             let v: v128 = u32x4_shl(d, Self::SFMT_SL1 as u32);
             let z: v128 = v128_xor(z, a);
             let z: v128 = v128_xor(z, v);
-            let x: v128 = i8x16_swizzle(a, rotl);
+            let x = Self::v128_shl(a,Self::SFMT_SL2*8);
             let y: v128 = v128_and(y, mask);
             let z: v128 = v128_xor(z, x);
             v128_xor(z, y)
