@@ -52,10 +52,10 @@ pub(crate) fn extract(vals: i32x4, imm: usize) -> u32 {
 pub(crate) fn extract(vals: i32x4, imm: usize) -> u32 {
     unsafe {
         match imm {
-            0 => i32x4_extract_lane::<0>(vals) as u32,
-            1 => i32x4_extract_lane::<1>(vals) as u32,
-            2 => i32x4_extract_lane::<2>(vals) as u32,
-            3 => i32x4_extract_lane::<3>(vals) as u32,
+            0 => u32x4_extract_lane::<0>(vals),
+            1 => u32x4_extract_lane::<1>(vals),
+            2 => u32x4_extract_lane::<2>(vals),
+            3 => u32x4_extract_lane::<3>(vals),
             _ => core::hint::unreachable_unchecked(),
         }
     }
